@@ -8,17 +8,24 @@ import Homework from '@/components/Homework';
 import Users from '@/components/Users';
 import Profile from '@/components/Profile';
 
-const Index = () => {
+interface IndexProps {
+  user: any;
+  onLogout: () => void;
+}
+
+const Index = ({ user, onLogout }: IndexProps) => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const navigation = [
-    { id: 'dashboard', name: 'Главная', icon: 'Home' },
-    { id: 'schedule', name: 'Расписание', icon: 'Calendar' },
-    { id: 'grades', name: 'Оценки', icon: 'Trophy' },
-    { id: 'homework', name: 'Домашние задания', icon: 'BookOpen' },
-    { id: 'users', name: 'Пользователи', icon: 'Users' },
-    { id: 'profile', name: 'Профиль', icon: 'User' },
+  const allNavigation = [
+    { id: 'dashboard', name: 'Главная', icon: 'Home', roles: ['admin', 'teacher', 'student', 'parent'] },
+    { id: 'schedule', name: 'Расписание', icon: 'Calendar', roles: ['admin', 'teacher', 'student', 'parent'] },
+    { id: 'grades', name: 'Оценки', icon: 'Trophy', roles: ['admin', 'teacher', 'student', 'parent'] },
+    { id: 'homework', name: 'Домашние задания', icon: 'BookOpen', roles: ['admin', 'teacher', 'student'] },
+    { id: 'users', name: 'Пользователи', icon: 'Users', roles: ['admin'] },
+    { id: 'profile', name: 'Профиль', icon: 'User', roles: ['admin', 'teacher', 'student', 'parent'] },
   ];
+
+  const navigation = allNavigation.filter(item => item.roles.includes(user?.role));
 
   const stats = [
     { title: 'Средний балл', value: '4.8', icon: 'TrendingUp', color: 'from-purple-500 to-pink-500' },
@@ -48,7 +55,13 @@ const Index = () => {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Электронный Дневник
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">Личный кабинет</p>
+            <div className="flex items-center gap-2 mt-3 p-2 rounded-lg bg-muted/50">
+              <div className="text-2xl">{user?.avatar_emoji || '👤'}</div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">{user?.first_name} {user?.last_name}</p>
+                <p className="text-xs text-muted-foreground capitalize">{user?.role === 'admin' ? 'Администратор' : user?.role === 'teacher' ? 'Учитель' : user?.role === 'student' ? 'Ученик' : 'Родитель'}</p>
+              </div>
+            </div>
           </div>
 
           <nav className="space-y-2">
@@ -67,6 +80,17 @@ const Index = () => {
               </button>
             ))}
           </nav>
+
+          <div className="mt-auto pt-4">
+            <Button
+              onClick={onLogout}
+              variant="outline"
+              className="w-full border-border hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Icon name="LogOut" size={18} className="mr-2" />
+              Выйти
+            </Button>
+          </div>
         </aside>
 
         <main className="flex-1 p-8">
@@ -74,7 +98,7 @@ const Index = () => {
             <div className="space-y-6 animate-fade-in">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-bold">Добро пожаловать! 👋</h2>
+                  <h2 className="text-3xl font-bold">Добро пожаловать, {user?.first_name}! 👋</h2>
                   <p className="text-muted-foreground mt-1">Сегодня, 19 октября 2025</p>
                 </div>
                 <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
